@@ -10,7 +10,7 @@ Requires: python with json support
 # TODO:
 Download files. It is not working ATM.
 
-Verify past token - if it works, skip all the initial process.
+Verify last token - if it works, skip all the initial process.
 
 # Thanks
 
