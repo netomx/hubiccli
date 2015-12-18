@@ -1,7 +1,10 @@
 # hubiccli
 Unofficial hubiC cli manager, based on bash
+
 Version: 0.1
+
 Author: NetoMX
+
 Requires: python with json support
 
 # TODO:
