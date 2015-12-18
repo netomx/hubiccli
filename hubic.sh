@@ -50,9 +50,13 @@ function setup () {
 	rm /tmp/paso1.txt
 }
 
+if [ $# == 0 ]; then
+		echo "hubiC cli manager - NetoMX v0.1"
+        echo "Usage: $0 [-l / -d / -u] [FILE]"
+        exit 1
+fi
 
-
-if [ $# == 0 ] || [ $# -lt 2 ]; then
+if [ $1 == "-d" ] || [ $1 == "-u" ] && [ $# != 2 ]; then
 		echo "hubiC cli manager - NetoMX v0.1"
         echo "Usage: $0 [-l / -d / -u] [FILE]"
         exit 1
