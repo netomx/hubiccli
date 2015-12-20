@@ -1,14 +1,21 @@
 #!/bin/bash
-# Edit this variables
-URL="https//your.redirect.url/"
-CLIENTID="your_client_id"
-CLIENTSECRET="your_client_secret"
+URL="https://ulbox.com/"
+CLIENTID="api_hubic_D062CRq4OC0BRYJdZNKK7xRP7auIaP8M"
+CLIENTSECRET="cbdWdgsrYQCWQ9501Pjdcl3LI1sqGgtAXKxzdI9orpsPoSyiXGlNtfTKCgF9Ia1B"
 CREDENTIALS=$( printf "$CLIENTID:$CLIENTSECRET" | base64 -w 0 )
-# Stop editing if you don't know what you're doing!
 
-#TODO:
-#Download files. It is not working ATM.
-#Verify past token - if it works, skip all the initial process.
+urlen() {
+    # Thanks https://gist.github.com/cdown/1163649
+    local length="${#1}"
+    for (( i = 0; i < length; i++ )); do
+        local c="${1:i:1}"
+        case $c in
+            [a-zA-Z0-9.~_-]) printf "$c" ;;
+            *) printf '%s' "$c" | xxd -p -c1 |
+                   while read c; do printf '%%%s' "$c"; done ;;
+        esac
+    done
+}
 
 function setup () {
 	# Obtain request code
@@ -25,9 +32,9 @@ function setup () {
 			exit 1
 	fi
 
-	# Obtaining the auth code
-	AUTHCODE=$( curl -s "https://api.hubic.com/oauth/token/" -H "Authorization: Basic $CREDENTIALS" --data-urlencode "code=$REQUESTTOKEN" --data-urlencode "redirect_uri=$URL" --data-urlencode "grant_type=authorization_code" | python -c 'import sys, json; print json.load(sys.stdin)[sys.argv[1]]' access_token )
-	if [ $? -ne 0 ]; then
+	# Obtaining the auth code	
+	AUTHCODE=$( curl -s "https://api.hubic.com/oauth/token/" -H "Authorization: Basic $CREDENTIALS" --data-urlencode "code=$REQUESTTOKEN" --data-urlencode "redirect_uri=$URL" --data-urlencode "grant_type=authorization_code" | cut -d"\"" -f10 )
+	if [ $? -ne 0 ] || [ "$AUTHCODE" == "" ]; then
 			echo "Error $? getting Auth Code, try again later."
 			exit 1
 	fi
@@ -43,8 +50,8 @@ function setup () {
 		exit 1
 	fi
 
-	ENDPOINT=$(  cat /tmp/paso1.txt | python -c 'import sys, json; print json.load(sys.stdin)[sys.argv[1]]' endpoint )
-	TOKEN=$( cat /tmp/paso1.txt | python -c 'import sys, json; print json.load(sys.stdin)[sys.argv[1]]' token )
+	TOKEN=$( cat /tmp/paso1.txt | cut -d"\"" -f4 )
+	ENDPOINT=$( cat /tmp/paso1.txt | cut -d"\"" -f8 )
 
 	#Deleting temp file
 	rm /tmp/paso1.txt
@@ -56,7 +63,7 @@ if [ $# == 0 ]; then
         exit 1
 fi
 
-if [ $1 == "-d" ] || [ $1 == "-u" ] && [ $# != 2 ]; then
+if [ "$1" == "-d" ] || [ "$1" == "-u" ] && [ $# != 2 ]; then
 		echo "hubiC cli manager - NetoMX v0.1"
         echo "Usage: $0 [-l / -d / -u] [FILE]"
         exit 1
@@ -65,7 +72,8 @@ fi
 case "$1" in
 "-d")	echo "Downloading file: $2"
 		setup
-		curl -s -g -H "X-Auth-Token: $TOKEN" "$ENDPOINT/default/$FILE" -X GET -o "$2"
+		FILENAME=$( urlen "$2" )
+		curl -s -g -H "X-Auth-Token: $TOKEN" "$ENDPOINT/default/$FILENAME" -X GET -o "$2"
 		if [ $? -ne 0 ]; then
 			echo "Error $? downloading file: $1" 
 			exit 1
@@ -94,9 +102,4 @@ case "$1" in
 		echo "Usage: $0 [-l / -d / -u] [FILE]"
 		exit
 	;;
-esac
-
-#For later use?
-#FILE=$( python -c "import sys, urllib as ul; print ul.quote_plus(sys.argv[1])" "$2" )
-#printf "%s" "DEBUG: Filename $FILE"
-#exit
+esac		
