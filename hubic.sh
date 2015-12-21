@@ -91,7 +91,9 @@ case "$1" in
 	;;
 "-l")	echo "Listing files:"
 		setup
-		curl -s -H "X-Auth-Token: $TOKEN" $ENDPOINT/default?format=json -X GET | python -m json.tool
+		#Uncomment this if you want pretty JSON
+		#curl -s -H "X-Auth-Token: $TOKEN" $ENDPOINT/default?format=json -X GET | python -m json.tool
+		curl -s -H "X-Auth-Token: $TOKEN" $ENDPOINT/default?format=json -X GET | grep -e "bytes" -e "name"
 		if [ $? -ne 0 ]; then
 			echo "Error $? listing files" 
 			exit 1
