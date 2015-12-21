@@ -34,7 +34,7 @@ function setup () {
 
 	# Obtaining the auth code	
 	AUTHCODE=$( curl -s "https://api.hubic.com/oauth/token/" -H "Authorization: Basic $CREDENTIALS" --data-urlencode "code=$REQUESTTOKEN" --data-urlencode "redirect_uri=$URL" --data-urlencode "grant_type=authorization_code" | cut -d"\"" -f10 )
-	if [ $? -ne 0 ] || [ "$AUTHCODE" == "" ]; then
+	if [ $? -ne 0 ] || [ -z "$AUTHCODE" ]; then
 			echo "Error $? getting Auth Code, try again later."
 			exit 1
 	fi
