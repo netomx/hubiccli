@@ -2,6 +2,8 @@
 URL="EDIT_HERE"
 CLIENTID="EDIT_HERE"
 CLIENTSECRET="EDIT_HERE"
+USEREMAIL="EDIT@HERE"
+USERPWD="EDITHERE"
 CREDENTIALS=$( printf "$CLIENTID:$CLIENTSECRET" | base64 -w 0 )
 
 urlen() {
@@ -26,7 +28,7 @@ function setup () {
 	fi
 
 	# Accepting the app itself for the request token
-	REQUESTTOKEN=$( curl -s -i "https://api.hubic.com/oauth/auth/" --data-urlencode "oauth=$OAUTH" --data-urlencode "action=accepted" --data-urlencode "account=r" --data-urlencode "credentials=r" --data-urlencode "getAllLinks=r" --data-urlencode "links=r" --data-urlencode "links=w" --data-urlencode "usage=r" --data-urlencode "login=ernesto@catalogomty.com" --data-urlencode "user_pwd=iodkaxpq1-" --data-urlencode "submit=Accept" | grep Location | cut -c11- | grep code | cut -d"=" -f2 | cut -d"&" -f1 )
+	REQUESTTOKEN=$( curl -s -i "https://api.hubic.com/oauth/auth/" --data-urlencode "oauth=$OAUTH" --data-urlencode "action=accepted" --data-urlencode "account=r" --data-urlencode "credentials=r" --data-urlencode "getAllLinks=r" --data-urlencode "links=r" --data-urlencode "links=w" --data-urlencode "usage=r" --data-urlencode "login=$USEREMAIL" --data-urlencode "user_pwd=$USERPWD" --data-urlencode "submit=Accept" | grep Location | cut -c11- | grep code | cut -d"=" -f2 | cut -d"&" -f1 )
 	if [ $? -ne 0 ]; then
 			echo "Error getting Request Token, try again later"
 			exit 1
